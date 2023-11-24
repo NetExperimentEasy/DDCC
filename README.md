@@ -6,7 +6,7 @@ deploy:
 
 ```
 apt install redis-server
-pip3 install numpy, redis
+pip3 install numpy redis
 ```
 
 gym_rlcc:
@@ -31,7 +31,7 @@ make install
 train_code:
 
 ```
-pip3 install numpy, redis
+pip3 install numpy redis
 # 安装好gym_rlcc
 ```
 
@@ -42,7 +42,7 @@ apt install redis-server
 # 安装mininet
 https://zhuanlan.zhihu.com/p/576832894
 
-pip3 install streamlit, redis
+pip3 install streamlit redis
 ```
 
 # 如何训练 satcc
