@@ -48,28 +48,45 @@ pip3 install streamlit, redis
 # 如何训练 satcc
 
 1. 挂载 satcc_framework
-   cd satcc_framework
-   sudo bash load.sh
+
+```
+cd satcc_framework
+sudo bash load.sh
+```
 
 2. 启动训练环境
-   cd train_env_tcp
-   sudo python3 train_env_tcpnl.py
+
+```
+cd train_env_tcp
+sudo python3 train_env_tcpnl.py
+```
 
 3. 训练
-   cd train_code
-   python3 train_rlcc.py
+
+```
+cd train_code
+python3 train_rlcc.py
+```
 
 # 如何部署 satcc
 
 1. 挂载 satcc_framework
-   cd satcc_framework
-   sudo bash load.sh
+
+```
+cd satcc_framework
+sudo bash load.sh
+```
 
 2. 部署
-   cd deploy
-   python3 deploy.py
+
+```
+cd deploy
+python3 deploy.py
+```
 
 # 如何实时可视化
 
+```
 cd train_env_tcp/webui
 streamlit run app.py
+```
