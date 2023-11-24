@@ -26,6 +26,9 @@ tar -xf v1.0.2.tar.gz
 cd hiredis-1.0.2/
 make
 make install
+
+cd satcc_framework
+make all
 ```
 
 train_code:
