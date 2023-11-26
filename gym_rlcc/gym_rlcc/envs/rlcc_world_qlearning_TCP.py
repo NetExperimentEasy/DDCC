@@ -237,24 +237,20 @@ class RlccEnvQT(gym.Env):
 
     def step(self, action_index):
 
-        # print(action, type(action)) # 适配rllib，tianshou
-        if isinstance(action_index, np.int64):
-            action_index = [action_index]
-
         cwnd_change = 0
         if self.plan == 1:
-            # cwnd = self.cwnd * action_index[0] * 2  # acition value is rate, cwnd_gain = 2
+            # cwnd = self.cwnd * action_index * 2  # acition value is rate, cwnd_gain = 2
             pass
 
         if self.plan == 2:
             # action is the index of action
-            cwnd_change = self._action_to_direction[action_index[0]]
+            cwnd_change = self._action_to_direction[action_index]
             cwnd_change = np.clip(cwnd_change, self.action_min-1, self.action_max+1)
 
         if self.plan == 3:
             # add satcc action here
             
-            action_choosed = self._action_to_direction[action_index[0]]
+            action_choosed = self._action_to_direction[action_index]
             action_choosed = np.clip(action_choosed, self.action_min-1, self.action_max+1)
 
             if action_choosed == 0:

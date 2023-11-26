@@ -69,7 +69,7 @@ try:
                 print("---big---", big_th, big_delay)
             print("now :", th, delay, end='\r')
 
-            newobs, reward, terminated, truncated, info = env.step(np.array(action_index))
+            newobs, reward, terminated, truncated, info = env.step(action_index)
             delay = (newobs[3]-newobs[2])
             th = newobs[0]
             if delay > delay_max:

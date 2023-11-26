@@ -49,7 +49,7 @@ try:
         print("train: episode:", i+count_eposide)
         
         if(i%5 == 0):
-            agent.save_w(f"./result/0929/{i+count_eposide}.npy")
+            agent.save_w(f"./result/32-4-4/{i+count_eposide}.npy")
         
         obs, info = env.reset()
         done = False
@@ -80,7 +80,7 @@ try:
                 print("---big---", big_th, big_delay)
             print("now :", th, delay, end='\r')
 
-            newobs, reward, terminated, truncated, info = env.step(np.array(action))
+            newobs, reward, terminated, truncated, info = env.step(action)
             delay = (newobs[3]-newobs[2])
             th = newobs[0]
             if delay > delay_max:
