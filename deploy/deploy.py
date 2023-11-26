@@ -16,7 +16,7 @@ pub.psubscribe("rlccstate_*")
 msg_stream = pub.listen()
 
 for msg in msg_stream:
-    print(str(msg["channel"], encoding="utf-8"), '订阅成功')
+    print(str(msg["channel"], encoding="utf-8"), 'subscribe success')
     break
 
 
@@ -100,8 +100,8 @@ if __name__ == "__main__":
     action_num = 3  # 动作数量
 
     tiles_per_dim = [16, 16]
-    max_th = 104857600 
-    max_delay = 1024 * 500
+    max_th = 1000*1024
+    max_delay = 1024*500
     lims = [(0, max_th), (0, max_delay)]
     # number of tilings
     tilings = 32

@@ -107,7 +107,6 @@ class RlccEnvQT(gym.Env):
             dtype=np.float32,
         )
 
-        # self.scale = np.array([1, 1, 512, 512], dtype=np.float32)
         self.scale = np.array([1, 1, 1, 1, 1, 1, 1], dtype=np.float32)
         
         if "plan" in config.keys():
@@ -163,68 +162,26 @@ class RlccEnvQT(gym.Env):
             print(str(msg["channel"], encoding="utf-8"), '订阅成功')
             break
 
-    def _reward(self, state):
-
-        # # satcc reward  : 效果差
-        # dr_diff = state[-2] - state[-1]
-        # goodvalue = (dr_diff*100 / (np.absolute(dr_diff) + state[-1])) + 10 # 维持稳定，适当奖励，不能太大，防止减低的惩罚太小    
-        # rtt_diff = state[2] - state[4]
-        # rtt_good = (rtt_diff*100 / (np.absolute(rtt_diff) + state[4])) + 5  # 增加为+ 减少为- 鼓励降低延迟 惩罚增加延迟，+5抵消波动，适当容忍延迟波动
-        # reward = goodvalue - rtt_good
+    def _reward(self, state):  
         
-        # # base reward
-        # # throughput - rtt_change(rtt - min_rtt)
-        # reward = state[-2] - state[2] + state[3]
-
-        # reward = state[-2] - 3*(state[2] - state[3])
-        # 用delivered rate可能会更好 state[0], throughput state[1]
-        # delay = (state[3] - state[2])/32
-        # throughput = state[1] / 1024
         throughput = state[1]
         delivered_rate = state[0]
         delivered_rate_scale = state[0]/256 if state[0]/256 > 1 else 1
         delay = state[3] - state[2]
         delay_scale = delay/1024
-        # delay = (state[3] - state[2]) - 5120 # 1024 1ms  10ms 容忍10ms
 
-        # self.aveV = self.EMA(delivered_rate, self.aveV, 8)
-
-        if delay_scale < 1: # log不能对0计算, 防止过量惩罚
-            reward = np.log(delivered_rate_scale) + delivered_rate*10/(100*1024)
-        else:
-            reward = np.log(delivered_rate_scale) + delivered_rate*10/(100*1024) - 2*np.log(delay_scale)
+        # # log line reward
+        # if delay_scale < 1: # log不能对0计算, 防止过量惩罚
+        #     reward = np.log(delivered_rate_scale) + delivered_rate*10/(100*1024)
+        # else:
+        #     reward = np.log(delivered_rate_scale) + delivered_rate*10/(100*1024) - 2*np.log(delay_scale)
         
-        # reward = delivered_rate - (delay/32)
-
-        # # owl reward
-        # if state[-1]<1:
-        #     state[-1]=1
-        # loss = state[6] / state[-1]  # 这个丢包率是不是得长期丢包率？
-        # # # sending_rate = state[-2]
-        # deta = 0.5
-        # reward = state[-2] - deta * (1/(1-loss)) # ?有问题，很小
-
-        # # # aurora reward
-        # if state[-1]<1:
-        #     state[-1]=1
-        # loss = state[6] / state[-1]  # loss of this sample interval
-        # reward = 10*state[-2] - 1000*state[2] - 2000*loss  # 这个奖励在异构训练环境，奖励会不均匀
-
-        # # new reward
-        # reward = state[-2] - 100*(state[2] - state[3])
-
-        # # copa reward
-        # # log(throughput) - beta * log(delay)
-        # beta = 1
-        # reward = np.log(state[-2]) - beta * np.log(state[2] - state[3])
-
-        # # mvfst reward 
-        # # 发现copa的奖励函数在训练的时候, 0.5Mbps和100Mbps环境一起训练会有问题
-        # # throughput - beta * delay
-        # beta = 1
-        # reward = state[-2] - beta * state[2]
-
-
+        # log reward
+        if delay_scale < 1: # log不能对0计算, 防止过量惩罚
+            reward = np.log(delivered_rate_scale)
+        else:
+            reward = np.log(delivered_rate_scale) - 2*np.log(delay_scale)
+        
         return reward
 
     def _get_obs(self):
@@ -296,32 +253,7 @@ class RlccEnvQT(gym.Env):
 
         if self.plan == 3:
             # add satcc action here
-
-            """
-            3x3动作
-            # action_step: satcc动作的调节参数，0,1,2
-            # action 0,1,2表示 step为0； aciton 345表示 step为1； action 678表示 step为2；动作总共为9个
-            if action[0] < 3:
-                action_step = 0
-            elif action[0] > 5:
-                action_step = 2
-            else:
-                action_step = 1
-            action = self._action_to_direction[action[0]]
-
-            if action_step == 1:
-                self.cwnd_alpha = self.cwnd_alpha * self.cwnd_init
-            elif action_step == 2:
-                self.cwnd_alpha = self.cwnd_alpha / self.cwnd_init
             
-            if action == 0:
-                cwnd_change = 0
-            elif action == 1:
-                cwnd_change = int(self.cwnd_alpha / self.cwnd) + 1
-            else:
-                cwnd_change = -(int(self.cwnd_alpha / self.cwnd) + 1)
-            """
-            # 比例动作
             action_choosed = self._action_to_direction[action_index[0]]
             action_choosed = np.clip(action_choosed, self.action_min-1, self.action_max+1)
 

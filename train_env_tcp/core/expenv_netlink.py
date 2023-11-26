@@ -67,13 +67,10 @@ class TCPNLMininet:
         set random env to link
         """
         e = random.randrange(0, 10)
-        rate = f'{random.randrange(5,60)}Mbit'
-        # rate = f'{random.randrange(25,35)}Mbit'
+        rate = f'{random.randrange(5,200)}Mbit'
         buffer = f'{random.randrange(1400,2000)}b'
-        # delay = f'{random.randrange(5,200)}ms' if e > 7 else \
-        #     f'{random.randrange(5,70)}ms'
-        delay = f'{random.randrange(5,200)}ms' if e > 8 else \
-            f'{random.randrange(5,70)}ms'
+        delay = f'{random.randrange(5,300)}ms' if e > 8 else \
+            f'{random.randrange(5,100)}ms'
         if ifloss:
             loss = f'{random.randrange(0,100)/10}%' if e > 7 else '0%'
         else:
@@ -94,9 +91,9 @@ class TCPNLMininet:
         return f"{rate}{delay}{loss}"
 
     def set_fix_env(self, switch, ifpublish=True,
-                    rate='40Mbit',
+                    rate='20Mbit',
                     buffer='1600b',
-                    delay='100ms',
+                    delay='40ms',
                     loss='0%'
                     ):
         cmd_at(switch, traffic_shaping, ifbackend=False,
@@ -197,7 +194,7 @@ class TCPNLMininet:
                         continue
                     if command.endswith("reset"): # 收到重启命令，重启流
                         if ifexp:
-                            if exp_count%10 == 0:
+                            if exp_count%5 == 0: # 每5次 测试一次
                                 exp = True
                             else:
                                 exp = False

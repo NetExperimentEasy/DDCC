@@ -9,13 +9,13 @@ import numpy as np
 tiles_per_dim = [16, 16]
 # value limits of each dimension
 # state1 state2 action
-lims = [(0, 104857600), (0, 2048000)]   # 104857600
+th_max = 1024*1000 # 1G
+delay_max = 1024*500 # 500ms
+lims = [(0, th_max), (0, delay_max)]   # 104857600
 # number of tilings
 tilings = 32
 
-# satcc
-# action_num = 9  # 3x3动作 action 0,1,2表示 step为0； aciton 345表示 step为1； action 678表示 step为2；动作总共为9个
-action_num = 3  # 比例动作
+action_num = 3 
 
 tile = TileCoder(tiles_per_dim, lims, tilings)
 w = []
@@ -23,9 +23,9 @@ for i in range(action_num):
     w.append(np.zeros(tile.n_tiles))
 
 wfile = "rlcc.npy"
-# , wfile=wfile
-# , wfile='./result/0929/90.npy'
-agent = Qlearning(tile=tile, w=w, action_num=action_num, alpha=0.05, beta=0.9, epsilon=0.8, tilings=tilings, wfile='./result/0929/980.npy')
+# wfile='./result/0929/90.npy' , 接力训练时候，需要指定wfile以指定预加载模型，同时指定count_eposide
+count_eposide = 0
+agent = Qlearning(tile=tile, w=w, action_num=action_num, alpha=0.05, beta=0.9, epsilon=0.8, tilings=tilings)
 
 # owl
 
@@ -42,13 +42,13 @@ big_delay = 0
 
 reward_ave = []
 
-count_eposide = 980
+epoch_num = 500
 
 try:
-    for i in range(690): #90 3小时 360 12h  690  23h
+    for i in range(epoch_num): #90 3小时 360 12h  690  23h
         print("train: episode:", i+count_eposide)
         
-        if(i%30 == 0):
+        if(i%5 == 0):
             agent.save_w(f"./result/0929/{i+count_eposide}.npy")
         
         obs, info = env.reset()
@@ -57,16 +57,16 @@ try:
         # env.render()
         delay = (obs[3]-obs[2])
         th = obs[0]
-        if delay > 2048000:
-            delay = 2048000
+        if delay > delay_max:
+            delay = delay_max
         if delay < 0:
             delay = 0
-        if th > 104857600:
-            th = 104857600
+        if th > th_max:
+            th = th_max
         states = np.array([th, delay])
         while not done:
             # print(states)
-            if i%10 != 0: # exp 不进行训练
+            if i%5 != 0: # exp 不进行训练，每隔5次进行一次测试， 同步修改在train_env_tcp/core/expenv_netlink 会fix环境一次
                 action_index = agent.explore_action(states=states)
             else:
                 _, action_index = agent.getMaxPredQ(states=states)
@@ -83,14 +83,14 @@ try:
             newobs, reward, terminated, truncated, info = env.step(np.array(action))
             delay = (newobs[3]-newobs[2])
             th = newobs[0]
-            if delay > 2048000:
-                delay = 2048000
+            if delay > delay_max:
+                delay = delay_max
             if delay < 0:
                 delay = 0
-            if th > 104857600:
-                th = 104857600
+            if th > th_max:
+                th = th_max
             next_states = np.array([th, delay])
-            if(i%10 == 0): # exp 不进行训练
+            if(i%5 == 0): # exp 不进行训练
                 agent.updateQ(reward=reward, prev_states=states, action_index=action_index, next_states=next_states)
             record_reward.append(reward)
             states = next_states

@@ -9,12 +9,12 @@ import numpy as np
 tiles_per_dim = [16, 16]
 # value limits of each dimension
 # state1 state2 action
-lims = [(0, 104857600), (0, 2048000)]   # 104857600
+th_max = 1024*1000 # 1G
+delay_max = 1024*500 # 500ms
+lims = [(0, th_max), (0, delay_max)]   # 104857600
 # number of tilings
 tilings = 32
 
-# satcc
-# action_num = 9  # 3x3动作 action 0,1,2表示 step为0； aciton 345表示 step为1； action 678表示 step为2；动作总共为9个
 action_num = 3  # 比例动作
 
 tile = TileCoder(tiles_per_dim, lims, tilings)
@@ -22,10 +22,9 @@ w = []
 for i in range(action_num):
     w.append(np.zeros(tile.n_tiles))
 
-wfile = "rlcc.npy"
-# , wfile=wfile
-# wfile='./result/rate-acts/180.npy'
-agent = Qlearning(tile=tile, w=w, action_num=action_num, alpha=0.05, beta=0.9, epsilon=0.8, tilings=tilings, wfile='./result/0929/980.npy')
+
+wfile='./result/rate-acts/180.npy' # 指定加载模型
+agent = Qlearning(tile=tile, w=w, action_num=action_num, alpha=0.05, beta=0.9, epsilon=0.8, tilings=tilings, wfile=wfile)
 
 # owl
 
@@ -51,12 +50,12 @@ try:
         # env.render()
         delay = (obs[3]-obs[2])
         th = obs[0]
-        if delay > 2048000:
-            delay = 2048000
+        if delay > delay_max:
+            delay = delay_max
         if delay < 0:
             delay = 0
-        if th > 104857600:
-            th = 104857600
+        if th > th_max:
+            th = th_max
         states = np.array([th, delay])
         while not done:
             # print(states)
@@ -73,12 +72,12 @@ try:
             newobs, reward, terminated, truncated, info = env.step(np.array(action_index))
             delay = (newobs[3]-newobs[2])
             th = newobs[0]
-            if delay > 2048000:
-                delay = 2048000
+            if delay > delay_max:
+                delay = delay_max
             if delay < 0:
                 delay = 0
-            if th > 104857600:
-                th = 104857600
+            if th > th_max:
+                th = th_max
             next_states = np.array([th, delay])
 
             record_reward.append(reward)
