@@ -2,7 +2,6 @@
 ---
 
 ## Introduction
----
   DDCC framework provides interfaces for reinforcement learning algorithms and a corresponding OpenAI Gym standard reinforcement learning environment, allowing integration of mainstream reinforcement learning models with high flexibility. The framework decouples the learning model from congestion control, enabling lightweight deployment on end devices. This decoupled design lays the foundation for end-network collaborative congestion control and supports various network protocols. The framework is highly modular, equipped with out-of-the-box network simulation training environments and visualization components. 
 ![1](https://github.com/NetExperimentEasy/DDCC/assets/48404708/8be6cbdd-7f59-47db-8ae5-0c1f450dfc46)
 
