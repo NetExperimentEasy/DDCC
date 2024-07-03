@@ -1,30 +1,36 @@
-# satcc_framework
 
-satcc_framework 是一个在用户态进行 TCP 拥塞控制算法开发的接口实现，基于 netlink 技术。
 
-satcc_framework 实现了将内核统计的状态采样（如发送速率，时延）发送到 redis 通道（rlccstate\*{flag}:flag 为模块自动分配的流 id），通过 redis 通道(rlccaction\_{flag})将想要设置的拥塞参数:cwnd，pacing_rate 传送给内核模块，内核模块进行自动配置的功能。
 
-## 项目构成：
+# Introduction
 
-- tcp_satcc.c : 内核模块
-- tcp_satcc_user.c : 用户态转发程序，内核与 redis 通信中转
-- load.sh : 启动脚本
-- rmmod.sh : 卸载模块脚本
+ An interface implementation for developing TCP congestion control algorithms in user space, based on netlink technology,including  executord and  forwarder.
 
-## 使用方法：
+---
+The framework implements the function of sending state samples collected by the kernel (such as sending rate, latency) to the redis channel (rlccstate\\*{flag}: flag is the stream ID automatically assigned by the module), and transmitting the congestion parameters you want to set (cwnd, pacing_rate) to the kernel module through the redis channel (rlccaction\\_{flag}), enabling automatic configuration by the kernel module.
 
-'''
-make all : 编译所有
-make module : 编译内核模块
-make user : 编译转发程序
-make clean : 清理编译结果
-'''
+## Project Components:
 
-## 编译依赖：
+- tcp_satcc.c : Executor kernel module
+- tcp_satcc_user.c : User space forwarding program, intermediary communication between kernel and redis
+- load.sh : Startup script
+- rmmod.sh : Module removal script
 
-- libhiredis ： redis c 语言客户端
-- pthread ： 多线程库
+## Usage:
 
-## 运行依赖：
+```bash
+make all : Compile all
+make module : Compile the kernel module
+make user : Compile the forwarding program
+make clean : Clean up compilation results
+```
 
-- redis ： apt install redis-server
+## Compilation Dependencies:
+
+- libhiredis: Redis C language client
+- pthread: Multithreading library
+
+## Runtime Dependencies:
+
+- redis: apt install redis-server
+
+---
