@@ -120,5 +120,7 @@ python3 deploy.py
 cd train_env_tcp/webui
 streamlit run app.py
 ```
+The visual interface is as follows:
+![image](https://github.com/user-attachments/assets/bc439995-9163-46e7-a6fd-cb2034826d62)
 
 ---
